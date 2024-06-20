@@ -68,10 +68,10 @@ run: $(NAME)
 	@./$(NAME) 10 1200 200 200 15
 
 helgrind: $(NAME) 
-	@valgrind --tool=helgrind -s --history-level=approx ./$(NAME)  200 100 200 200 3
+	@valgrind --tool=helgrind -s --history-level=approx ./$(NAME)  5 100 200 200
 
 valgrind: $(NAME) 
-	@valgrind ./$(NAME)  15 800 200 200 3
+	@valgrind ./$(NAME)  4 800 200 200 2
 
 drd: $(NAME) 
 	@valgrind --tool=drd ./$(NAME)  200 1200 200 200 15

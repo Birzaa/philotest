@@ -19,8 +19,6 @@ int main(int argc, char **argv)
     {
         program.nb_must_eat = atoi(argv[5]);
     }
-    if(num_philos == 1)
-        exit(1);
     initialize_program(&program, num_philos, time_to_die, time_to_eat, time_to_sleep);
     create_philo_threads(&program, num_philos);
     monitor_philos(&program);

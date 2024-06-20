@@ -4,63 +4,34 @@
 void	print_status(t_philo *philo, const char *status)
 {
 	pthread_mutex_lock(philo->write_lock);
-	printf("%zu %d %s\n", get_current_time() - philo->start_time, philo->id,
+	printf("%zu %d %s\n", get_current_time() - philo->program->start_time, philo->id,
 		status);
 	pthread_mutex_unlock(philo->write_lock);
 }
 
 void	pick_up_forks_even(t_philo *philo)
 {
-
 	pthread_mutex_lock(philo->r_fork);
 	if (dead_loop(philo))
-	{
-		/* pthread_mutex_unlock(philo->r_fork);
-		pthread_mutex_unlock(&philo->l_fork); */
 		return ;
-	}
 	print_status(philo, "has taken a fork");
 	pthread_mutex_lock(&philo->l_fork);
 	if (dead_loop(philo))
-	{
-		/* pthread_mutex_unlock(philo->r_fork);
-		pthread_mutex_unlock(&philo->l_fork); */
 		return ;
-	}
 	print_status(philo, "has taken a fork");
-	// pthread_mutex_unlock(philo->r_fork);
-	// pthread_mutex_unlock(&philo->l_fork);
 }
 
 void	pick_up_forks_odd(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->l_fork);
 	if (dead_loop(philo))
-	{
-		/* pthread_mutex_unlock(philo->r_fork);
-		pthread_mutex_unlock(&philo->l_fork); */
 		return ;
-	}
 	print_status(philo, "has taken a fork");
 	pthread_mutex_lock(philo->r_fork);
 	if (dead_loop(philo))
-	{
-		/* pthread_mutex_unlock(philo->r_fork);
-		pthread_mutex_unlock(&philo->l_fork); */
 		return ;
-	}
 	print_status(philo, "has taken a fork");
-	// pthread_mutex_unlock(&philo->l_fork);
-	// pthread_mutex_unlock(philo->r_fork);
 }
-
-/* void put_down_forks(t_philo *philo)
-{
-	pthread_mutex_unlock(philo->l_fork);
-	print_status(philo, "put down left fork");
-	pthread_mutex_unlock(philo->r_fork);
-	print_status(philo, "put down right fork");
-} */
 
 void	eat(t_philo *philo)
 {
@@ -69,6 +40,7 @@ void	eat(t_philo *philo)
 	{
 		pthread_mutex_unlock(&philo->l_fork);
 		pthread_mutex_unlock(philo->r_fork);
+		pthread_mutex_unlock(&philo->meal_lock);
 		return ;
 	}
 	philo->last_meal = get_current_time();
@@ -97,7 +69,6 @@ void	think(t_philo *philo)
 
 void	ft_slip(t_philo *philo)
 {
-	dead_loop(philo);
 	if (!philo->program->stop)
 	{
 		print_status(philo, "is sleeping");
@@ -109,11 +80,18 @@ void	*philo_routine(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
 
+	pthread_mutex_lock(&philo->program->m_time);
+	philo->program->start_time = get_current_time();
+	pthread_mutex_unlock(&philo->program->m_time);
+	if(philo->program->num_philos == 1)
+	{
+		print_status(philo, "has taken a fork");
+		ft_usleep2(philo->time_to_die, philo);
+		print_status(philo, "died");
+		return NULL;
+	}
 	wait_threads(philo);
 	usleep(100);
-	/* pthread_mutex_lock(&philo->program->mutex_begin);
-	philo->start_time = get_current_time();
-	pthread_mutex_unlock(&philo->program->mutex_begin); */
 	if (philo->id % 2 == 0)
 		ft_usleep2(philo->time_to_eat, philo);
 	while (!dead_loop(philo))

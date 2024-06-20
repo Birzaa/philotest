@@ -40,18 +40,21 @@ void	*monitor_philos(void *arg)
 {
 	t_program *program = (t_program *)arg;
 	pthread_t monitor_thread;
-	if (pthread_create(&monitor_thread, NULL, monitor, program) != 0)
+	if (program->num_philos != 1)
 	{
-		perror("Failed to create monitor thread");
-		destroy_program(program);
-		exit(1);
-	}
+		if (pthread_create(&monitor_thread, NULL, monitor, program) != 0)
+		{
+			perror("Failed to create monitor thread");
+			destroy_program(program);
+			exit(1);
+		}
 
-	if (pthread_join(monitor_thread, NULL) != 0)
-	{
-		perror("Failed to join monitor thread");
-		destroy_program(program);
-		exit(1);
+		if (pthread_join(monitor_thread, NULL) != 0)
+		{
+			perror("Failed to join monitor thread");
+			destroy_program(program);
+			exit(1);
+		}
 	}
 
 	return (NULL);
