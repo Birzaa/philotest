@@ -12,8 +12,8 @@ int	dead_loop(t_philo *philo)
 int	check_philo_death(t_philo *philo, t_program *program, size_t time_to_die)
 {
 
-	pthread_mutex_lock(&philo->program->dead_lock);
 	int died = 0;
+	pthread_mutex_lock(&philo->meal_lock);
 	if (get_current_time() - philo->last_meal >= time_to_die / 1000
 		&& philo->eating == 0)
 	{
@@ -24,7 +24,7 @@ int	check_philo_death(t_philo *philo, t_program *program, size_t time_to_die)
 		died = 1;
 	}
 
-	pthread_mutex_unlock(&philo->program->dead_lock);
+	pthread_mutex_unlock(&philo->meal_lock);
 
 	return (died);
 }
@@ -63,8 +63,13 @@ void	*monitor(void *arg)
 				break ;
 			i++;
 		}
+		pthread_mutex_lock(&program->dead_lock);
 		if (program->stop == 1)
-			break ;
+		{
+			pthread_mutex_unlock(&program->dead_lock);
+			break;
+		}
+		pthread_mutex_unlock(&program->dead_lock);
 		if (program->nb_must_eat != -1)
 		{
 			if (check_all_philos_ate(program))
@@ -74,9 +79,15 @@ void	*monitor(void *arg)
 				program->stop = 1;
 				pthread_mutex_unlock(&program->dead_lock);
 			}
-			if (program->stop == 1)
-				break ;
+			pthread_mutex_lock(&program->dead_lock);
+		if (program->stop == 1)
+		{
+			pthread_mutex_unlock(&program->dead_lock);
+			break;
 		}
+		pthread_mutex_unlock(&program->dead_lock);
+		}
+		usleep(100);
 	}
 	return (NULL);
 }

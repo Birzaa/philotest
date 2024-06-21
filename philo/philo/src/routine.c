@@ -44,6 +44,7 @@ void	eat(t_philo *philo)
 		return ;
 	}
 	philo->last_meal = get_current_time();
+	philo->last_meal2 = get_current_time();
 	philo->meals_eaten++;
 	philo->eating = 1;
 	print_status(philo, "is eating");

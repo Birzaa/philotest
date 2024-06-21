@@ -17,6 +17,7 @@ typedef struct s_philo
 	int eating;
 	int meals_eaten;
 	size_t last_meal;
+	size_t last_meal2;
 	size_t time_to_die;
 	size_t time_to_eat;
 	size_t time_to_sleep;
@@ -28,6 +29,7 @@ typedef struct s_philo
 	pthread_mutex_t *write_lock;
 	pthread_mutex_t dead_lock;
 	pthread_mutex_t meal_lock;
+	pthread_mutex_t last_meal_lock;
 	struct s_program *program;
 } t_philo;
 
@@ -46,6 +48,7 @@ typedef struct s_program
 	pthread_mutex_t check_eat;
 	pthread_mutex_t	mutex_begin;
 	pthread_mutex_t	m_time;
+	pthread_mutex_t	test;
 	t_philo *philos;
 } t_program;
 

@@ -9,6 +9,7 @@ void init_global_mutexes(t_program *program)
     pthread_mutex_init(&program->ready, NULL);
     pthread_mutex_init(&program->mutex_begin, NULL);
     pthread_mutex_init(&program->m_time, NULL);
+    pthread_mutex_init(&program->test, NULL);
 }
 
 void init_philosophers(t_program *program, int num_philos, size_t time_to_die, size_t time_to_eat, size_t time_to_sleep)
@@ -22,12 +23,14 @@ void init_philosophers(t_program *program, int num_philos, size_t time_to_die, s
         program->philos[i].eating = 0;
         program->philos[i].meals_eaten = 0;
         program->philos[i].last_meal = get_current_time();
+        program->philos[i].last_meal2 = get_current_time();
         program->philos[i].time_to_die = time_to_die;
         program->philos[i].time_to_eat = time_to_eat;
         program->philos[i].time_to_sleep = time_to_sleep;
         program->philos[i].num_times_to_eat = -1; 
         program->philos[i].dead = program->dead_flag;
 		program->philos[i].r_fork = NULL;
+        pthread_mutex_init(&program->philos[i].last_meal_lock, NULL);
         if (program->philos[i].time_to_eat > program->philos[i].time_to_sleep)
 		    program->philos[i].t_think = (program->philos[i].time_to_eat - program->philos[i].time_to_sleep) + 1000;
 	    else
@@ -73,6 +76,7 @@ void destroy_program(t_program *program)
     pthread_mutex_destroy(&program->check_eat);
     pthread_mutex_destroy(&program->mutex_begin);
     pthread_mutex_destroy(&program->m_time);
+    pthread_mutex_destroy(&program->test);
 
     free(program->philos);
 }
